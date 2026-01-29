@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Store Checker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 0;
+}
+.logo {
+  display: block;
+  max-width: 260px;
+  margin: 0 auto 20px auto;
+}
+
+
+.container {
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+  background: white;
+  min-height: 100vh;
+}
+
+h1 {
+  text-align: center;
+}
+
+input, button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+button {
+  background: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+.store {
+  border-top: 1px solid #ddd;
+  padding: 15px 0;
+}
+
+.maps-btn {
+  display: inline-block;
+  margin-top: 5px;
+  background: #28a745;
+  color: white;
+  padding: 8px 12px;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.maps-btn:hover {
+  background: #1e7e34;
+}
+
+.error {
+  color: red;
+  margin-top: 10px;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <img src="ulac-logo.png" alt="United Legwear & Apparel Co." class="logo">
+<h1>Store Checker</h1>
+
+
+  <input id="postcode" placeholder="Enter UK postcode or Irish Eircode (e.g., D02 VF65 / H91 VR9W)">
+  <button onclick="findStores()">Find nearest stores</button>
+
+  <div id="output"></div>
+</div>
+
+<script>
+// ===============================
+// EDIT YOUR STORES HERE
+// ===============================
+const stores = [
+{
+  name: "Ashes Menswear",
+  address: "86 Old Christchurch Road, Bournemouth, BH1 1LR, UK",
+  lat: 50.721625,
+  lng: -1.875518
+},
+{
+  name: "Avoca Handweavers",
+  address: "Unit 1, Riverside Business Park, Rathnew, A67 N732, IE",
+  lat: 52.993805,
+  lng: -6.087147
+},
+{
+  name: "Badger Clothing",
+  address: "26 Bond Street, Brighton, BN1 1RD, UK",
+  lat: 50.823644,
+  lng: -0.140017
+},
+{
+  name: "Brown Thomas / Arnotts",
+  address: "88 Grafton Street, Dublin, D02 VF65, IE",
+  lat: 53.342594,
+  lng: -6.259579
+},
+{
+  name: "Todds Menswear",
+  address: "262A High Street, Lincoln, LN2 1HW, UK",
+  lat: 53.231078,
+  lng: -0.539858
+},
+{
+  name: "Clues Menswear",
+  address: "8 College Street, Northampton, NN1 2QF, UK",
+  lat: 52.237629,
+  lng: -0.898669
+},
+{
+  name: "Energy Clothing Stamford",
+  address: "9 Ironmonger Street, Stamford, PE9 1PL, UK",
+  lat: 52.652978,
+  lng: -0.478315
+},
+{
+  name: "Ghia Menswear",
+  address: "2 Ropergate, Pontefract, WF8 1LP, UK",
+  lat: 53.690709,
+  lng: -1.312189
+},
+{
+  name: "Niro Clothing",
+  address: "2 Cumbergate, Peterborough, PE1 1YR, UK",
+  lat: 52.573098,
+  lng: -0.243907
+},
+{
+  name: "Ikon Menswear",
+  address: "10 Tunsgate, Guildford, GU1 3QT, UK",
+  lat: 51.235203,
+  lng: -0.571635
+},
+{
+  name: "Jeremy Hobbs",
+  address: "3 Oakdene Parade, Surrey, KT11 2LR, UK",
+  lat: 51.329772,
+  lng: -0.411206
+},
+{
+  name: "The Lost Boys",
+  address: "Unit 2 The Point, Seaview Street, Cleethorpes, DN35 8EU, UK",
+  lat: 53.557462,
+  lng: -0.025388
+},
+{
+  name: "Burns Outfitters",
+  address: "15 St Patricks Street, Draperstown, BT45 7AJ, UK",
+  lat: 54.792245,
+  lng: -6.787805
+},
+{
+  name: "Hewetts of Marlow",
+  address: "47–49 High Street, Marlow, SL7 1BA, UK",
+  lat: 51.570548,
+  lng: -0.775284
+},
+{
+  name: "Partners Menswear",
+  address: "10 Hickmott Road, Sheffield, S11 8QF, UK",
+  lat: 53.368205,
+  lng: -1.497328
+},
+{
+  name: "The Men's Room",
+  address: "834 Green Lanes, London, N21 2RT, UK",
+  lat: 51.634484,
+  lng: -0.093742
+},
+{
+  name: "Smarts of York",
+  address: "59–63 Low Petergate, York, YO1 7HY, UK",
+  lat: 53.960678,
+  lng: -1.081229
+},
+{
+  name: "Statement of Intent",
+  address: "Savoy House, 16 West Street, Portadown, BT62 3PD, UK",
+  lat: 54.422237,
+  lng: -6.446136
+},
+{
+  name: "Trevails of Truro",
+  address: "31–32 River Street, Truro, TR1 2SJ, UK",
+  lat: 50.26366,
+  lng: -5.054183
+},
+{
+  name: "Truth Menswear",
+  address: "8 High Street, Ennis, V95 HN2, IE",
+  lat: 52.844494,
+  lng: -8.983336
+},
+{
+  name: "Union Menswear",
+  address: "19A Parsons Street, Banbury, OX16 5LY, UK",
+  lat: 52.061986,
+  lng: -1.338551
+},
+{
+  name: "Voisins Department Store",
+  address: "26–32 King Street, Jersey, JE4 8NF, UK",
+  lat: 49.18442,
+  lng: -2.10628
+},
+{
+  name: "Daniel Stores",
+  address: "Unit 47 Service Road, King Edward Court, Berkshire, SL4 1TQ, UK",
+  lat: 51.481855,
+  lng: -0.611026
+},
+{
+  name: "Wolf and West Menswear",
+  address: "4 Howley Square, Main Street, Oranmore, H91 VR9W, IE",
+  lat: 53.274412,
+  lng: -9.04906
+},
+{
+  name: "Coes",
+  address: "20–28 Norwich Road, Ipswich, IP1 2NH, UK",
+  lat: 52.060867,
+  lng: 1.145484
+},
+{
+  name: "Goddards",
+  address: "Wellesley Street, Kings Lynn, PE30 1QD, UK",
+  lat: 52.754656,
+  lng: 0.401634
+}
+
+];
+
+// ===============================
+// DO NOT EDIT BELOW THIS LINE
+// ===============================
+
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 3958.8; // miles
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) ** 2;
+
+  return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
+
+async function geocodeWithPostcodesIO(postcode) {
+  const res = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(postcode)}`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (!data || !data.result) return null;
+  return { lat: data.result.latitude, lng: data.result.longitude };
+}
+
+function geocodeWithNominatim(query, countrycodes) {
+  // IMPORTANT: Nominatim often blocks browser fetch() due to CORS.
+  // This uses JSONP (json_callback) so it works from a plain .html file.
+  return new Promise((resolve) => {
+    const cbName = "__nominatim_cb_" + Math.random().toString(36).slice(2);
+    const script = document.createElement("script");
+
+    let url =
+      "https://nominatim.openstreetmap.org/search?format=json&addressdetails=0&limit=1" +
+      (countrycodes ? `&countrycodes=${encodeURIComponent(countrycodes)}` : "") +
+      `&q=${encodeURIComponent(query)}`;
+
+    // If we're targeting the Republic of Ireland, tightly bound the search to ROI.
+    // (Approx ROI bbox) This helps avoid false matches elsewhere.
+    if (countrycodes && countrycodes.toLowerCase() === "ie") {
+      url += "&bounded=1&viewbox=" + encodeURIComponent("-10.7,55.5,-5.2,51.3");
+    }
+
+    url += `&json_callback=${encodeURIComponent(cbName)}`;
+
+    const timeout = setTimeout(() => {
+      cleanup();
+      resolve(null);
+    }, 8000);
+
+    function cleanup() {
+      clearTimeout(timeout);
+      try { delete window[cbName]; } catch (e) { window[cbName] = undefined; }
+      if (script && script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[cbName] = function (data) {
+      cleanup();
+      try {
+        if (!Array.isArray(data) || data.length === 0) return resolve(null);
+        resolve({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) });
+      } catch (e) {
+        resolve(null);
+      }
+    };
+
+    script.src = url;
+    script.async = true;
+    script.onerror = () => {
+      cleanup();
+      resolve(null);
+    };
+
+    document.body.appendChild(script);
+  });
+}
+
+function isIrishEircode(value) {
+  // Accepts full Eircode like "D02 VF65" (space optional)
+  // We'll be permissive on the last 4 chars (A-Z0-9) and rely on geocoding to validate.
+  const v = value.replace(/\s+/g, "").toUpperCase();
+  return /^[A-VY]\d{2}([0-9A-Z]{4})?$/.test(v);
+}
+
+function isUkPostcode(value) {
+  const v = value.trim().toUpperCase();
+  // Broad UK postcode pattern (not perfect, but good enough for switching logic)
+  return /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/.test(v);
+}
+
+async function getUserLatLng(postcode) {
+  const trimmed = postcode.trim();
+  const noSpace = trimmed.replace(/\s+/g, "").toUpperCase();
+
+  // Prefer UK-specific API when it looks like a UK postcode
+  if (isUkPostcode(trimmed)) {
+    const uk = await geocodeWithPostcodesIO(trimmed);
+    if (uk) return uk;
+  }
+
+  // Prefer IE-specific search when it looks like an Eircode
+  if (isIrishEircode(trimmed)) {
+    // Try a few variants; Nominatim can be picky depending on formatting.
+    const attempts = [
+      noSpace,
+      trimmed.toUpperCase(),
+      `${noSpace}, Ireland`,
+      `${trimmed.toUpperCase()}, Ireland`
+    ];
+
+    for (const q of attempts) {
+      const ie = await geocodeWithNominatim(q, "ie");
+      if (ie) return ie;
+    }
+  }
+
+  // Fallback: try UK API (sometimes users enter without space), then global Nominatim
+  const uk2 = await geocodeWithPostcodesIO(trimmed);
+  if (uk2) return uk2;
+
+  // Last resort: Nominatim without country restriction
+  return await geocodeWithNominatim(trimmed, null);
+}
+
+async function findStores() {
+  const postcode = document.getElementById("postcode").value.trim();
+  const output = document.getElementById("output");
+  output.innerHTML = "";
+
+  if (!postcode) {
+    output.innerHTML = "<p class='error'>Please enter a UK postcode or Irish Eircode.</p>";
+    return;
+  }
+
+  let coords = null;
+  try {
+    coords = await getUserLatLng(postcode);
+  } catch (e) {
+    coords = null;
+  }
+
+  if (!coords || typeof coords.lat !== "number" || typeof coords.lng !== "number" || Number.isNaN(coords.lat) || Number.isNaN(coords.lng)) {
+    output.innerHTML = "<p class='error'>Could not find that postcode/Eircode. Please check it and try again.</p>";
+    return;
+  }
+
+  const userLat = coords.lat;
+  const userLng = coords.lng;
+
+  // Debug: show what we geocoded to (remove if not wanted)
+  // output.innerHTML += `<p class="debug">Geocoded to: ${userLat.toFixed(6)}, ${userLng.toFixed(6)}</p>`;
+
+  const results = stores.map(store => ({
+    ...store,
+    distance: haversine(userLat, userLng, store.lat, store.lng)
+  }))
+  .sort((a, b) => a.distance - b.distance)
+  .slice(0, 3);
+
+  results.forEach((store, i) => {
+    output.innerHTML += `
+      <div class="store">
+        <strong>${i + 1}. ${store.name}</strong>
+        <p>${store.address}</p>
+        <p>${store.distance.toFixed(1)} miles away</p>
+        <a class="maps-btn"
+           href="https://www.google.com/maps/search/?api=1&query=${store.lat},${store.lng}"
+           target="_blank">
+           Open in Google Maps
+        </a>
+      </div>
+    `;
+  });
+}
+</script>
+</body>
+</html>
